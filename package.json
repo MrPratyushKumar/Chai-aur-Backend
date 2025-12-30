@@ -15,7 +15,7 @@
   "author": "Pratyush Pandey",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.11"
-     
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4"
   }
 }
