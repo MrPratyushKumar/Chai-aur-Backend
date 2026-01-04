@@ -1,36 +1,60 @@
-// require('dotenv').config({path:'./env'})
-// Load environment variables
-import dotenv from "dotenv"
+// Load environment variables from .env file
+import dotenv from "dotenv";
 
-// Database connection
-import connectDB from "./db/index.js"
+// Import database connection function
+import connectDB from "./db/index.js";
 
-// Express app instance
-import { app } from "./app.js"
+// Import configured Express app
+import { app } from "./app.js";
 
-
-// Configure dotenv
+/*
+  Configure dotenv:
+  - Loads environment variables into process.env
+  - Must be called BEFORE using any env variables
+*/
 dotenv.config({
   path: "./env",
-})
+});
 
+/*
+  Define server port:
+  - Use PORT from environment if available
+  - Fallback to 8000 for local development
+*/
+const PORT = process.env.PORT || 8000;
 
-// Define port
-const PORT = process.env.PORT || 8000
+/*
+  Step 1: Connect to the database
+  Step 2: Start the Express server ONLY after DB connection succeeds
 
-
-// Connect to database, then start server
+  This ensures:
+  - App does not start without DB
+  - Prevents runtime crashes
+*/
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`)
-    })
+      console.log(`🚀 Server is running at http://localhost:${PORT}`);
+    });
   })
   .catch((error) => {
-    console.error("❌ MongoDB connection failed:", error)
-    process.exit(1)
-  })
- 
+    // Log database connection error
+    console.error("❌ MongoDB connection failed:", error);
+
+    // Exit process with failure code
+    process.exit(1);
+  });
+
+
+// Real Production Flow:
+//   dotenv → load env
+// ↓
+// connectDB → connect MongoDB
+// ↓
+// app.listen → start server
+// ↓
+// ready to accept requests
+
 
 
 /*
