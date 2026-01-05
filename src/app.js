@@ -1,15 +1,29 @@
-// Import core libraries
+// ----------------------------------------------------
+// Core library imports
+// ----------------------------------------------------
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-// Create an Express application instance
+// ----------------------------------------------------
+// Route imports
+// ----------------------------------------------------
+import userRouter from "./routes/user.routes.js";
+
+// ----------------------------------------------------
+// Create Express application instance
+// ----------------------------------------------------
 const app = express();
 
+/* ====================================================
+   GLOBAL MIDDLEWARE CONFIGURATION
+   ==================================================== */
+
 /*
-  CORS configuration:
-  - origin: allows requests only from trusted frontend URL
-  - credentials: true allows cookies, authorization headers, etc.
+  CORS Configuration
+  ------------------
+  - origin: allows requests only from the frontend URL
+  - credentials: allows cookies, authorization headers, etc.
 */
 app.use(
   cors({
@@ -20,27 +34,82 @@ app.use(
 
 /*
   Parse incoming JSON payloads
-  - limit prevents large payload attacks
+  ----------------------------
+  - limit: prevents large payload attacks
+  - Required for APIs receiving JSON data
 */
 app.use(express.json({ limit: "16kb" }));
 
 /*
-  Parse URL-encoded data (form submissions)
+  Parse URL-encoded form data
+  ---------------------------
   - extended: true allows nested objects
+  - Used for form submissions
 */
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 /*
-  Serve static files from "public" directory
-  - Used for images, uploads, documents, etc.
+  Serve static files
+  -----------------
+  - Files inside "public" folder can be accessed directly
+  - Example: images, uploads, documents
 */
 app.use(express.static("public"));
 
 /*
   Parse cookies from incoming requests
+  -----------------------------------
   - Required for authentication using HTTP-only cookies
 */
 app.use(cookieParser());
 
-// Export app to be used in server.js or index.js
+/* ====================================================
+   ROUTES
+   ==================================================== */
+
+/*
+  User routes
+  -----------
+  All user-related APIs are prefixed with:
+  /api/v1/users
+
+  Example:
+  POST /api/v1/users/register
+*/
+app.use("/api/v1/users", userRouter);
+
+/* ====================================================
+   HEALTH CHECK ROUTE
+   ==================================================== */
+
+/*
+  Root route
+  ----------
+  Used to quickly verify that the backend is running
+*/
+app.get("/", (req, res) => {
+  res.send("🚀 Backend API is running");
+});
+
+/* ====================================================
+   GLOBAL 404 HANDLER
+   ==================================================== */
+
+/*
+  This middleware runs when:
+  - No route matches the request
+  - Prevents default HTML 404 response
+  - Returns a clean JSON error instead
+*/
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.originalUrl,
+  });
+});
+
+// ----------------------------------------------------
+// Export app for server bootstrap (index.js / server.js)
+// ----------------------------------------------------
 export { app };

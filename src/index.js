@@ -1,50 +1,63 @@
+// ----------------------------------------------------
 // Load environment variables from .env file
+// ----------------------------------------------------
 import dotenv from "dotenv";
 
-// Import database connection function
+// Database connection function
 import connectDB from "./db/index.js";
 
-// Import configured Express app
+// Pre-configured Express application
 import { app } from "./app.js";
 
 /*
-  Configure dotenv:
-  - Loads environment variables into process.env
-  - Must be called BEFORE using any env variables
+  Load environment variables into process.env
+
+  ⚠️ IMPORTANT:
+  This must be executed BEFORE accessing any
+  environment variables (process.env.*)
 */
 dotenv.config({
   path: "./env",
 });
 
-/*
-  Define server port:
-  - Use PORT from environment if available
-  - Fallback to 8000 for local development
-*/
+// ----------------------------------------------------
+// Server Configuration
+// ----------------------------------------------------
+
+// Use PORT from environment variables
+// Fallback to 8000 for local development
 const PORT = process.env.PORT || 8000;
 
 /*
-  Step 1: Connect to the database
-  Step 2: Start the Express server ONLY after DB connection succeeds
+  Application Bootstrap Flow
+  --------------------------
+  1️⃣ Connect to MongoDB
+  2️⃣ Start Express server ONLY after DB connection succeeds
 
-  This ensures:
-  - App does not start without DB
-  - Prevents runtime crashes
+  Why this approach?
+  - Prevents server from running without database access
+  - Avoids runtime crashes caused by missing DB connection
 */
 connectDB()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`🚀 Server is running at http://localhost:${PORT}`);
+      console.log(
+        `🚀 Server started successfully at http://localhost:${PORT}`
+      );
     });
   })
   .catch((error) => {
-    // Log database connection error
+    /*
+      Handle database connection failure
+
+      - Log detailed error
+      - Exit process with non-zero code
+      - Prevents app from running in broken state
+    */
     console.error("❌ MongoDB connection failed:", error);
 
-    // Exit process with failure code
     process.exit(1);
   });
-
 
 // Real Production Flow:
 //   dotenv → load env
@@ -55,6 +68,13 @@ connectDB()
 // ↓
 // ready to accept requests
 
+
+// 🏆 Interview Tip (FAANG-Style Answer)
+
+// Q: Why do you start the server only after DB connection?
+// A:
+
+// “To ensure the application doesn’t accept requests without
 
 
 /*
