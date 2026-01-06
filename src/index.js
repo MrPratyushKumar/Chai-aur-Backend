@@ -24,9 +24,6 @@ dotenv.config({
 // Server Configuration
 // ----------------------------------------------------
 
-// Use PORT from environment variables
-// Fallback to 8000 for local development
-const PORT = process.env.PORT || 8000;
 
 /*
   Application Bootstrap Flow
@@ -40,11 +37,9 @@ const PORT = process.env.PORT || 8000;
 */
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(
-        `🚀 Server started successfully at http://localhost:${PORT}`
-      );
-    });
+    app.listen(process.env.PORT || 8000, () => {
+        console.log(`⚙️ Server is running at port : ${process.env.PORT}`);
+    })
   })
   .catch((error) => {
     /*
@@ -54,7 +49,7 @@ connectDB()
       - Exit process with non-zero code
       - Prevents app from running in broken state
     */
-    console.error("❌ MongoDB connection failed:", error);
+    console.error("❌ MongoDB connection failed !!!", error);
 
     process.exit(1);
   });

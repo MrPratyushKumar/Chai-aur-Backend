@@ -78,38 +78,12 @@ app.use(cookieParser());
 */
 app.use("/api/v1/users", userRouter);
 
-/* ====================================================
-   HEALTH CHECK ROUTE
-   ==================================================== */
 
-/*
-  Root route
-  ----------
-  Used to quickly verify that the backend is running
-*/
-app.get("/", (req, res) => {
-  res.send("🚀 Backend API is running");
-});
-
-/* ====================================================
-   GLOBAL 404 HANDLER
-   ==================================================== */
-
-/*
-  This middleware runs when:
-  - No route matches the request
-  - Prevents default HTML 404 response
-  - Returns a clean JSON error instead
-*/
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-    path: req.originalUrl,
-  });
-});
-
-// ----------------------------------------------------
+//----------------------------------------------------
 // Export app for server bootstrap (index.js / server.js)
 // ----------------------------------------------------
 export { app };
+
+
+
+// http://localhost:8000/api/v1/users/register
